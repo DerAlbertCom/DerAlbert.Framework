@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Machine.Specifications;
 using Machine.Specifications.Model;
 using Machine.Specifications.Runner;
@@ -13,6 +14,7 @@ namespace DerAlbert.Runner.MSpec.VisualStudio
         {
             return context.GetInfo().GetVisualStudioTest(specification.GetInfo());
         }
+
         public static Test GetVisualStudioTest(this ContextInfo context, SpecificationInfo specification)
         {
             var test = new Test();
@@ -29,6 +31,8 @@ namespace DerAlbert.Runner.MSpec.VisualStudio
             {
                 case Status.Failing:
                     vsResult.Outcome=TestOutcome.Failed;
+                    vsResult.ErrorMessage = result.Exception.Message;
+                    vsResult.ErrorStackTrace = result.Exception.StackTrace;
                     break;
                 case Status.Passing:
                     vsResult.Outcome=TestOutcome.Passed;
@@ -41,6 +45,15 @@ namespace DerAlbert.Runner.MSpec.VisualStudio
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+
+            // don't dont know
+            foreach (var supplement in result.Supplements)
+            {
+                foreach (var keyValue in supplement.Value)
+                {
+                    vsResult.Messages.Add($"{supplement}:{keyValue.Key}:{keyValue.Value}");
+                }
             }
             return vsResult;
         }

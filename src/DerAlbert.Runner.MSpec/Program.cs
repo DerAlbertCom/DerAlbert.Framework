@@ -33,19 +33,21 @@ namespace DerAlbert.Runner.MSpec
         {
             var designTime = args.Any(a => a.Contains("designtime"));
             var scanner = new VisualStudioAssemblyScanner(services);
-            var assemblyNames = libraryManager.GetReferencingLibraries("machine.specifications").SelectMany(l=>l.Assemblies);
+            var assemblyNames = libraryManager.GetReferencingLibraries("machine.specifications").SelectMany(l => l.Assemblies);
             foreach (var assemblyName in assemblyNames)
             {
-
                 var assembly = loadContext.Load(assemblyName);
-                scanner.SendToVisualStudio(assembly);
-                    var listener = new AggregateRunListener(new ISpecificationRunListener[]
+                if (designTime)
+                {
+                    scanner.SendToVisualStudio(assembly);
+                }
+                var listener = new AggregateRunListener(new ISpecificationRunListener[]
                     {
                         new DnxListener(new ColorOutput(new VerboseOutput(new DefaultConsole()))),
                         new VisualStudioSpecificationRunListener(services)
                     });
-                    var runner = new DefaultRunner(listener, RunOptions.Default);
-                    runner.RunAssembly(assembly);
+                var runner = new DefaultRunner(listener, RunOptions.Default);
+                runner.RunAssembly(assembly);
             }
         }
     }

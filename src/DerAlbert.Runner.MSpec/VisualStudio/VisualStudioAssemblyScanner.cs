@@ -10,18 +10,18 @@ namespace DerAlbert.Runner.MSpec.VisualStudio
 {
     public class VisualStudioAssemblyScanner
     {
-        private readonly IServiceProvider services;
         private readonly ISourceInformationProvider provider;
+        private ITestDiscoverySink sink;
+
         public VisualStudioAssemblyScanner(IServiceProvider services)
         {
-            this.services = services;
             provider = (ISourceInformationProvider)services.GetService(typeof(ISourceInformationProvider));
+            sink = (ITestDiscoverySink)services.GetService(typeof(ITestDiscoverySink));
         }
 
         public void SendToVisualStudio(Assembly assembly)
         {
             var explorer = new AssemblyExplorer();
-            var sink = (ITestDiscoverySink)services.GetService(typeof(ITestDiscoverySink));
             var contexts = explorer.FindContextsIn(assembly);
             foreach (var context in contexts)
             {
