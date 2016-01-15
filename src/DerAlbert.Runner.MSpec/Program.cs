@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using DerAlbert.Runner.MSpec.VisualStudio;
 using Machine.Specifications.Runner;
 using Machine.Specifications.Runner.Impl;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -8,28 +9,44 @@ namespace DerAlbert.Runner.MSpec
 {
     public class Program
     {
-        private IApplicationEnvironment appEnv;
-        private ILibraryManager libraryManager;
-        private IAssemblyLoadContext loadContext;
+        private readonly IServiceProvider services;
+        private readonly IApplicationEnvironment appEnv;
+        private readonly ILibraryManager libraryManager;
+        private readonly IAssemblyLoadContext loadContext;
 
-        public Program()
+        public Program(IServiceProvider services)
         {
+            this.services = services;
             appEnv = PlatformServices.Default.Application;
             libraryManager = PlatformServices.Default.LibraryManager;
             loadContext = PlatformServices.Default.AssemblyLoadContextAccessor.Default;
         }
 
+        [STAThread]
         public void Main(string[] args)
         {
+            Console.WriteLine("Foobar");
             Run(args);
         }
 
         private void Run(string[] args)
         {
-            var library = libraryManager.GetLibrary(appEnv.ApplicationName);
-            var assembly = loadContext.Load(library.Assemblies.First());
-            var runner = new DefaultRunner(new DnxListener(new ColorOutput(new VerboseOutput(new DefaultConsole()))),RunOptions.Default);
-            runner.RunAssembly(assembly);
+            var designTime = args.Any(a => a.Contains("designtime"));
+            var scanner = new VisualStudioAssemblyScanner(services);
+            var assemblyNames = libraryManager.GetReferencingLibraries("machine.specifications").SelectMany(l=>l.Assemblies);
+            foreach (var assemblyName in assemblyNames)
+            {
+
+                var assembly = loadContext.Load(assemblyName);
+                scanner.SendToVisualStudio(assembly);
+                    var listener = new AggregateRunListener(new ISpecificationRunListener[]
+                    {
+                        new DnxListener(new ColorOutput(new VerboseOutput(new DefaultConsole()))),
+                        new VisualStudioSpecificationRunListener(services)
+                    });
+                    var runner = new DefaultRunner(listener, RunOptions.Default);
+                    runner.RunAssembly(assembly);
+            }
         }
     }
 }

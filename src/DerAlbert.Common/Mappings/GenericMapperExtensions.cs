@@ -23,10 +23,6 @@ namespace DerAlbert.Mappings
             return Mapper.Map<IEnumerable<TDestination>>(source);
         }
 
-        public static IProjectionExpression Project<TDestination>(this IQueryable<TDestination> source) where TDestination : class
-        {
-            return AutoMapper.QueryableExtensions.Extensions.Project(source);
-        }
 
         public static IEnumerable<TDestination> ToEnumerable<TDestination>(this IProjectionExpression projectionExpression) where TDestination : class
         {
