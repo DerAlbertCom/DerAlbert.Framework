@@ -1,0 +1,13 @@
+.vs
+*.user
+bin
+obj
+Debug
+Release
+_NCrunch*
+nCrunchTemp*
+TestResults
+packages
+artifacts
+node_modules
+src/AspNet.*

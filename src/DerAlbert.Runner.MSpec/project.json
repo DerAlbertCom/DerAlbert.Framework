@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0-*",
+  "description": "DerAlbert.Runner.Specs Class Library",
+  "authors": [ "DerAl" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "dependencies": {
+    "Microsoft.Dnx.TestHost": "1.0.0-rc1-*",
+    "Machine.Specifications": "0.9.3",
+    "FluentAssertions": "4.2.1"
+  },
+  "frameworks": {
+    "dnx451": { } 
+  }
+}
